@@ -4,7 +4,7 @@ Range_min = 0;
 Range_max = 10;
 SD_min = 1;
 SD_max = 4;%0;
-Number_of_Hotspots = 2;
+Number_of_Hotspots = 3;
 Mat_Size = (((Range_max-Range_min)*(1/Resolution))+1)^2;
 Hot_Spots = zeros(Mat_Size,1);
 
@@ -22,13 +22,20 @@ for a=1:Number_of_Hotspots
     Shape_X = randi([SD_min SD_max],1);%/10;
     Shape_Y = randi([SD_min SD_max],1);%/10;
     
+    Good_Bad = randi([1 2],1);                                                   % determin if the hotspot is of good or bad quilaty
+    
     %% Hotspot info
     Pos = [Pos_X Pos_Y];
     Shape = [Shape_X .3; .3 Shape_Y];                                       % shape [(width of x) (?) ; (?) (width of y)]
     
     %% Make hotspots
     HotSpot = mvnpdf([X(:) Y(:)],Pos,Shape);
-    Hot_Spots = Hot_Spots + HotSpot;
+    if Good_Bad == 1
+        Hot_Spots = Hot_Spots - HotSpot;
+    else
+        Hot_Spots = Hot_Spots + HotSpot;
+    end
+    
 end
 
 %% reshape???
