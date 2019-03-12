@@ -47,7 +47,11 @@ colormap('jet');                                                            % Se
 figure;
 Int_Heat_map = heatmap(X(1,:),Y(:,1),Value);
 Int_Heat_map.GridVisible = 'off';                                           % Remove gridlines
+Int_Heat_map.ColorbarVisible = 'off';                                           % Remove colour bar
+Int_Heat_map.FontColor = 'none';
+Int_Heat_map.ColorLimits = [-max(abs(Value(:))) max(abs(Value(:)))];
 colormap('jet');                                                            % Set colour scale 'jet'= clearest for humans
 
 %% repeat???
 % for latter versions...
+

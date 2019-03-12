@@ -41,6 +41,13 @@ end
 %% reshape???
 Hot_Spots = reshape(Hot_Spots,length(y),length(x));
 
+%%
+% A = [1 9 -2; 8 4 -5; -11 0 5];
+% MX = max(abs(A(:)))
+% MN = min(A(:))
+% MX = max(abs(Hot_Spots(:)));
+% MN = min(Hot_Spots);
+
 
 %% plots
 % 3d "surface" plot
@@ -58,5 +65,9 @@ zlabel('Probability Density');
 figure;
 Heat_map = heatmap(Hot_Spots);
 Heat_map.GridVisible = 'off';                                               % Remove gridlines
+Heat_map.ColorbarVisible = 'off';                                           % Remove colour bar
+% made lables invisable but dont think there is a way to get rid of the lables
+Heat_map.FontColor = 'none';
+Heat_map.ColorLimits = [-max(abs(Hot_Spots(:))) max(abs(Hot_Spots(:)))];
 colormap('jet');                                                            % Set colour scale 'jet'= clearest for humans
 
