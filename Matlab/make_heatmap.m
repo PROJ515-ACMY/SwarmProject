@@ -1,21 +1,24 @@
 %% Varables
 Resolution_decimal_place = 2;                                               % 0-3 how many dp you want the data set to
 loop = 1;
+Last = 0;                                                                   % Used in later version of the software
 
 f1 = figure('Name','Surface Plot','NumberTitle','off');
 f2 = figure('Name','Raw Heatmap','NumberTitle','off');
 f3 = figure('Name','Heatmap','NumberTitle','off');
 
-filename_1 = 'Current_Data.txt';                                                     % CSV x,y,v x,y= copradanates v= value
+filename_1 = 'Current_Data.txt';                                            % CSV x,y,v x,y= copradanates v= value
 filename_2 = 'Start_Stopped.txt';
 
 %% poll start stop file
 while loop == 1
     
     % read file
-    File_Data_2 = csvread(filename_2);
-    
-    if File_Data_2(1,1) == 1
+%     File_Data_2 = csvread(filename_2);
+    [Start, ~, ~, filename_1] = textread(filename_2, '%d %d %d %s');
+    filename_1 = char(filename_1);
+
+    if Start == 1
         % exit while loop
         loop = 0;
     end
@@ -115,12 +118,11 @@ zlabel('Value - V','fontweight','b');
 title('Natural neighbor Interpolation Method','fontweight','b');
 
 %% tell argos finished
-File_Data_2(2,1) = 1;
+Finish = 1;
+File_Data_2 = [Start, Last, Finish, filename_1];
 
 % write file
 fileID = fopen(filename_2, 'w');
-fprintf(fileID, '%d\n', File_Data_2);
+fprintf(fileID, '%d %d %d %s', File_Data_2);
 fclose(fileID);
-% might need a pause to let argos close the file befor i can open here...
-
 

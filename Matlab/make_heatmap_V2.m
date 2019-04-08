@@ -7,10 +7,23 @@ f1 = figure('Name','Surface Plot','NumberTitle','off');
 f2 = figure('Name','Raw Heatmap','NumberTitle','off');
 f3 = figure('Name','Heatmap','NumberTitle','off');
 
-filename_1 = 'Current_Data.txt';                                                      % CSV x,y,v x,y= copradanates v= value
+filename_1 = 'Current_Data.txt';                                            % CSV x,y,v x,y= copradanates v= value
 filename_2 = 'Start_Stopped.txt';
 
-%% Loop
+%% poll start stop file
+while loop == 1
+    % read file
+    [Start, ~, ~, filename_1] = textread(filename_2, '%d %d %d %s');
+    filename_1 = char(filename_1);
+
+    if Start == 1
+        % exit while loop
+        loop = 0;
+    end
+end
+
+%% Loop until done
+loop = 1;
 while loop == 1
 
     %% Get data
@@ -125,14 +138,17 @@ while loop == 1
         File_Data_1_old = File_Data_1;
         
         %% check if last reading
-        File_Data_2 = csvread(filename_2);
-        if File_Data_2(1,1) == 1
+        [~, Last, ~, ~] = textread(filename_2, '%d %d %d %s');
+%         File_Data_2 = csvread(filename_2);
+        if Last == 1
             %% tell argos finished
-            File_Data_2(2,1) = 1;
+            Finish = 1;
+            File_Data_2 = [Start, Last, Finish, filename_1];
+%             File_Data_2(2,1) = 1;
             
             % write file
             fileID = fopen(filename_2, 'w');
-            fprintf(fileID, '%d\n', File_Data_2);
+            fprintf(fileID, '%d %d %d %s', File_Data_2);
             fclose(fileID);
             
             % exit while loop
