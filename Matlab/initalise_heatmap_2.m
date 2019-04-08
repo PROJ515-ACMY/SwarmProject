@@ -1,10 +1,10 @@
 %% Varables
-Resolution = 0.1;
+Resolution = 0.005;
 Range_min = 0;
 Range_max = 10;
 SD_min = 1;
 SD_max = 4;%0;
-Number_of_Hotspots = 3;
+Number_of_Hotspots = 6;
 Mat_Size = (((Range_max-Range_min)*(1/Resolution))+1)^2;
 Hot_Spots = zeros(Mat_Size,1);
 
