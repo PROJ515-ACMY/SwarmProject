@@ -1,14 +1,13 @@
 %% Varables
 Resolution_decimal_place = 2;                                               % 0-3 how many dp you want the data set to
 loop = 1;
-% File_Data_old = [0,0,0];
 
 f1 = figure('Name','Surface Plot','NumberTitle','off');
 f2 = figure('Name','Raw Heatmap','NumberTitle','off');
 f3 = figure('Name','Heatmap','NumberTitle','off');
 
-filename_1 = 'test.txt';                                                     % CSV x,y,v x,y= copradanates v= value
-filename_2 = 'SS.txt';
+filename_1 = 'Current_Data.txt';                                                     % CSV x,y,v x,y= copradanates v= value
+filename_2 = 'Start_Stopped.txt';
 
 %% poll start stop file
 while loop == 1
@@ -73,11 +72,9 @@ Range_min_Y = min(File_Data_1(:,2));
 Range_max_Y = max(File_Data_1(:,2));
 
 %% make raw heatmap
-% Raw_Heatmap_Data = zeros(t(1,1)*(1/Resolution));
 Raw_Heatmap_Data = zeros(Range_max_Y,Range_max_X);
 
 % rearange data
-% Raw_Heatmap_Data(sub2ind(size(Raw_Heatmap_Data),(File_Data_1(:,2)*(1/Resolution)),(File_Data_1(:,1)*(1/Resolution)))) = File_Data_1(:,3);
 Raw_Heatmap_Data(sub2ind(size(Raw_Heatmap_Data),(File_Data_1(:,2)),(File_Data_1(:,1)))) = File_Data_1(:,3);
 
 %% Interpolate
@@ -85,7 +82,7 @@ F = scatteredInterpolant(File_Data_1(:,1),File_Data_1(:,2),File_Data_1(:,3));   
 F.Method = 'natural';                                                       % Defines how interpolation is made between points...
 
 % Get a set of coardanates evenly distrobuted throuout area.
-x = Range_min_X:1:Range_max_X;                                         % [low lim : Resolution : up lim]
+x = Range_min_X:1:Range_max_X;                                              % [low lim : Resolution : up lim]
 y = Range_min_Y:1:Range_max_Y;
 [X,Y] = meshgrid(x,y);
 
@@ -101,12 +98,11 @@ colormap('jet');                                                            % Se
 
 % Interpolated
 figure(f3);
-% Int_Heat_map = heatmap(X(1,:),Y(:,1),Value);
 Int_Heat_map = heatmap(x,y,flip(Value));
 Int_Heat_map.GridVisible = 'off';                                           % Remove gridlines
-% Int_Heat_map.ColorbarVisible = 'off';                                           % Remove colour bar
+% Int_Heat_map.ColorbarVisible = 'off';                                     % Remove colour bar
 % Int_Heat_map.FontColor = 'none';
-Int_Heat_map.ColorLimits = [0 1];  % changed from max(abs(Value(:)))
+Int_Heat_map.ColorLimits = [0 1];
 colormap('jet');                                                            % Set colour scale 'jet'= clearest for humans
 
 % 3d "surface" plot
@@ -126,4 +122,5 @@ fileID = fopen(filename_2, 'w');
 fprintf(fileID, '%d\n', File_Data_2);
 fclose(fileID);
 % might need a pause to let argos close the file befor i can open here...
+
 
