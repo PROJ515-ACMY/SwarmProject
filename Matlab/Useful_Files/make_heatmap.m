@@ -1,7 +1,6 @@
 %% Varables
 Resolution_decimal_place = 2;                                               % 0-3 how many dp you want the data set to
 loop = 1;
-Last = 0;                                                                   % Used in later version of the software
 
 f1 = figure('Name','Surface Plot','NumberTitle','off');
 f2 = figure('Name','Raw Heatmap','NumberTitle','off');
@@ -10,26 +9,25 @@ f3 = figure('Name','Heatmap','NumberTitle','off');
 filename_1 = 'Current_Data.txt';                                            % CSV x,y,v x,y= copradanates v= value
 filename_2 = 'Start_Stopped.txt';
 
-%% poll start stop file
+%% Poll start stop file so know when to start.
 while loop == 1
     
-    % read file
-%     File_Data_2 = csvread(filename_2);
-    [Start, ~, ~, filename_1] = textread(filename_2, '%d %d %d %s');
+    % Read file
+    [Start, Last, ~, filename_1] = textread(filename_2, '%d %d %d %s');
     filename_1 = char(filename_1);
 
-    if Start == 1
-        % exit while loop
+    if Last == 1
+        % Exit waiting to begin loop
         loop = 0;
     end
     
 end
 
-%% read file
+%% Read file
 File_Data_1 = csvread(filename_1);
 
-%% alter the data to work with matlab
-% resolution...
+%% Alter the argos data to work with matlab
+% Set the Resolution values
 if Resolution_decimal_place == 0
     Resolution = 1;
     Multiplier = 1;
@@ -48,36 +46,36 @@ else
     Multiplier = 100;
 end
 
-% offsets...
+% Work out a small offset
 x_off = abs(min(File_Data_1(:,1))) + Resolution;
 y_off = abs(min(File_Data_1(:,2))) + Resolution;
 
-% change from range -X,Y to 0,d+(X+a small amount (as doesnt like 0))
+% Change from range -X,Y to 0,X+a small offset (as doesnt like 0)
 File_Data_1(:,2) = (File_Data_1(:,2) + y_off);
 File_Data_1(:,1) = (File_Data_1(:,1) + x_off);
 
-% round data to resaloution required
+% Round data to resaloution required
 File_Data_1(:,2) = round(File_Data_1(:,2), Resolution_decimal_place);
 File_Data_1(:,1) = round(File_Data_1(:,1), Resolution_decimal_place);
 
-% change data from float to int...
+% Change data from float to int
 File_Data_1(:,2) = File_Data_1(:,2) * Multiplier;
 File_Data_1(:,1) = File_Data_1(:,1) * Multiplier;
 
-% fix remaining floats that refuse to be ints??? (15.000000)
+% Fix remaining floats that refuse to be ints??? (15.000000)
 File_Data_1(:,2) = fix(File_Data_1(:,2));
 File_Data_1(:,1) = fix(File_Data_1(:,1));
 
-% area whitch has been sampeled
+% Area whitch has been sampeled
 Range_min_X = min(File_Data_1(:,1));
 Range_max_X = max(File_Data_1(:,1));
 Range_min_Y = min(File_Data_1(:,2));
 Range_max_Y = max(File_Data_1(:,2));
 
-%% make raw heatmap
+%% Make raw heatmap
 Raw_Heatmap_Data = zeros(Range_max_Y,Range_max_X);
 
-% rearange data
+% Rearange data
 Raw_Heatmap_Data(sub2ind(size(Raw_Heatmap_Data),(File_Data_1(:,2)),(File_Data_1(:,1)))) = File_Data_1(:,3);
 
 %% Interpolate
@@ -89,6 +87,7 @@ x = Range_min_X:1:Range_max_X;                                              % [l
 y = Range_min_Y:1:Range_max_Y;
 [X,Y] = meshgrid(x,y);
 
+% Work out a "Value" for each coardanate
 Value = F(X,Y);                                                             % Maps each coardanate with a Value
 
 %% Plots
@@ -117,11 +116,11 @@ ylabel('Y','fontweight','b');
 zlabel('Value - V','fontweight','b');
 title('Natural neighbor Interpolation Method','fontweight','b');
 
-%% tell argos finished
+%% Tell argos mapping is finished
 Finish = 1;
 File_Data_2 = [Start, Last, Finish, filename_1];
 
-% write file
+% Write over file
 fileID = fopen(filename_2, 'w');
 fprintf(fileID, '%d %d %d %s', File_Data_2);
 fclose(fileID);
